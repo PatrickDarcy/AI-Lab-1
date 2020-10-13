@@ -4,7 +4,9 @@ static int const WIDTH = 1000;
 static int const HEIGHT = 550;
 
 Game::Game() :
-	window{sf::VideoMode{WIDTH,HEIGHT,32}, "Lab 1"}
+	window{sf::VideoMode{WIDTH,HEIGHT,32}, "Lab 1"},
+	wanderer{enemyType::Wanderer},
+	seeker{enemyType::Seek}
 {
 	srand(time(NULL));
 }
@@ -68,13 +70,15 @@ void Game::processGameEvents(sf::Event& event)
 void Game::update(sf::Time t_dt)
 {
 	player.update();
-	enemy.update();
+	wanderer.update(player.getPosition());
+	seeker.update(player.getPosition());
 }
 
 void Game::render()
 {
     window.clear();
 	player.render(window);
-	enemy.render(window);
+	wanderer.render(window);
+	seeker.render(window);
     window.display();
 }

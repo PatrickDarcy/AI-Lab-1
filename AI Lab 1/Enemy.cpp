@@ -1,24 +1,34 @@
 #include "Enemy.h"
 
-Enemy::Enemy()
+Enemy::Enemy(enemyType type) :
+	typeOfEnemy{type}
 {
 	velocity = sf::Vector2f(0.0f, 0.0f);
 	enemySprite.setPosition(500, 250);
-	enemyAngle = 0.0f;
 
 	if (!enemySpriteTexture.loadFromFile("Enemy.png"))
 	{
 		std::cout << "problem loading Player Texture" << std::endl;
 	}
 
+	enemyAngle = (rand() % 360) - 90;
 	enemySprite.setTexture(enemySpriteTexture);
 	enemySprite.setScale(0.5f, 0.5f);
-	randomVelocity();
 }
 
-void Enemy::update()
+void Enemy::update(sf::Vector2f targetPos)
 {
-	enemySprite.setPosition(enemySprite.getPosition() + velocity);
+	switch (typeOfEnemy)
+	{
+	case enemyType::Wanderer:
+		wandererVelocity();
+		break;
+	case enemyType::Seek:
+		seekVelocity(targetPos);
+		break;
+	default:
+		break;
+	}
 	boundaryCheck();
 }
 
@@ -37,11 +47,22 @@ sf::Vector2f Enemy::getSpriteOrigin()
 	return enemySprite.getOrigin();
 }
 
-void Enemy::randomVelocity()
+void Enemy::wandererVelocity()
 {
 	speed *= rand() % 1 - 1;
 	velocity.x = speed * cos(enemyAngle * PI / 180);
 	velocity.y = speed * sin(enemyAngle * PI / 180);
+	enemySprite.rotate(enemyAngle);
+	enemySprite.setPosition(enemySprite.getPosition() + velocity);
+}
+
+void Enemy::seekVelocity(sf::Vector2f targetPos)
+{
+	speed = 2;
+	velocity = targetPos - enemySprite.getPosition();
+	velocity = normalize(velocity);
+	velocity = sf::Vector2f(velocity.x * speed, velocity.y * speed);
+	enemySprite.setPosition(enemySprite.getPosition() + velocity);
 }
 
 void Enemy::render(sf::RenderWindow& t_window)
@@ -67,4 +88,9 @@ void Enemy::boundaryCheck()
 	{
 		enemySprite.setPosition(sf::Vector2f(enemySprite.getPosition().x, 0));
 	}
+}
+
+enemyType Enemy::getEnemyType()
+{
+	return typeOfEnemy;
 }

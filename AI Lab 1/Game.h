@@ -13,7 +13,8 @@ public:
 private:
 
 	Player player;
-	Enemy enemy;
+	Enemy wanderer;
+	Enemy seeker;
 	sf::RenderWindow window;
 	void processEvents();
 	void update(sf::Time t_dt);
